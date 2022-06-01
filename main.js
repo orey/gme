@@ -12,7 +12,13 @@ function roll(dicestring){
     let temp = dicestring.split('+');
     let pips = 0;
     if (temp.length > 1)
-        
+        try {
+            pips = parseInt(xtemp[1]);
+        }
+        catch (e) {
+            output("Exception ");
+            output(
+        }
     return Math.floor((Math.random()*faces)+1);
 }
 
