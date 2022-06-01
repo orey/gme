@@ -1,36 +1,54 @@
 'use strict';
 
-/*
- * Main random function
- */
+function output(s, debug=true){
+    if (debug)
+        console.log(s);
+}
+
 function rollDie(faces){
     return Math.floor((Math.random()*faces)+1);
 }
 
-// Dice string 3d6 2d6+1 3D8+4
+// Dice string 3d6 2d6+1 3d8+4
 function roll(dicestring){
+    output(dicestring);
     let temp = dicestring.split('+');
     let pips = 0;
     if (temp.length > 1)
         try {
-            pips = parseInt(xtemp[1]);
+            pips = parseInt(temp[1]);
         }
         catch (e) {
             output("Exception ");
-            output(
+            output(e);
+            output(dicestring);
         }
-    return Math.floor((Math.random()*faces)+1);
+    let temp2 = temp[0].split('d');
+    let numb = temp2[0];
+    let faces = temp2[1];
+    let result = pips;
+    let temp3 = 0;
+    for (let i=0;i<numb;i++){
+        temp3 = rollDie(faces);
+        output(temp3);
+        result += temp3;
+    }
+    return result;
 }
 
-
+function testRoll(){
+    output("result = " + roll("3d6+1"));
+    output("result = " + roll("1d10"));
+    output("result = " + roll("1d100"));
+    output("result = " + roll("2d8+3"));
+    output("result = " + roll("1d4"));
+    output("result = " + roll("3d12+4"));
+}
 
 function isEven(n) {
    return n % 2 == 0;
 }
 
-function output(s){
-    console.log(s);
-}
 
 class Adventure {
     constructor(name) {
@@ -84,4 +102,4 @@ function main() {
 }
 
 main()
-
+testRoll();
