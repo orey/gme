@@ -7,6 +7,17 @@ function rollDie(faces){
     return Math.floor((Math.random()*faces)+1);
 }
 
+// Dice string 3d6 2d6+1 3D8+4
+function roll(dicestring){
+    let temp = dicestring.split('+');
+    let pips = 0;
+    if (temp.length > 1)
+        
+    return Math.floor((Math.random()*faces)+1);
+}
+
+
+
 function isEven(n) {
    return n % 2 == 0;
 }
