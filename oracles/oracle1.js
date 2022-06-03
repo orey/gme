@@ -34,26 +34,28 @@ const RESULT = {
 function oracle1(evalu,tension,verbose=false){
     // eval
     let modifier = evalu;
-    utils.output("eval = " + modifier.toString(),verbose);
-    utils.output("tension  = " + tension.toString(),verbose);
+    utils.output("Evaluation = " + modifier.toString()
+                 + " | Tension  = " + tension.toString(),verbose);
 
     // the oracle will say "yes" more often is the tension is high 
     let tn = 11;
-    utils.output("initial TN = " + tn.toString(),verbose);
     if (tension == 6)
         tn -= 2; // easier to say yes
     if (tension == 3)
         tn += 2;
-    utils.output("corrected TN = " + tn.toString(),verbose);
+    utils.output("Inital TN = 11, corrected TN = " + tn.toString(),verbose);
 
     // roll the fate
     let fate1 = dice.roll("1d10");
     let fate2 = dice.roll("1d10");
-    utils.output("Oracle rolls: " + fate1.toString() + " / " + fate2.toString(),verbose);    
+    utils.output("=> Oracle rolls: " + fate1.toString()
+                 + " + " + fate2.toString()
+                 + " = " + (fate1+fate2).toString(),
+                 verbose);    
 
     // roll the tension
     let mytension = dice.roll("1d10");
-    utils.output("Tension roll: " + mytension.toString(),verbose);
+    utils.output("=> Tension roll: " + mytension.toString(),verbose);
 
     // no modification due to tension
     if (mytension > tension) {
@@ -114,12 +116,79 @@ function oracle1(evalu,tension,verbose=false){
 }
 
 function test(){
+    oracle1(0,3,true);
+    utils.output("---",true);
     oracle1(0,4,true);
-    oracle1(0,4,true);
-    oracle1(0,4,true);
+    utils.output("---",true);
     oracle1(0,5,true);
-    oracle1(4,6,true);
+    utils.output("---",true);
+    oracle1(0,6,true);
+    utils.output("---",true);
 
+    oracle1(-2,3,true);
+    utils.output("---",true);
+    oracle1(-2,4,true);
+    utils.output("---",true);
+    oracle1(-2,5,true);
+    utils.output("---",true);
+    oracle1(-2,6,true);
+    utils.output("---",true);
+
+    oracle1(-4,3,true);
+    utils.output("---",true);
+    oracle1(-4,4,true);
+    utils.output("---",true);
+    oracle1(-4,5,true);
+    utils.output("---",true);
+    oracle1(-4,6,true);
+    utils.output("---",true);
+    
+    oracle1(-6,3,true);
+    utils.output("---",true);
+    oracle1(-6,4,true);
+    utils.output("---",true);
+    oracle1(-6,5,true);
+    utils.output("---",true);
+    oracle1(-6,6,true);
+    utils.output("---",true);
+
+    oracle1(2,3,true);
+    utils.output("---",true);
+    oracle1(2,4,true);
+    utils.output("---",true);
+    oracle1(2,5,true);
+    utils.output("---",true);
+    oracle1(2,6,true);
+    utils.output("---",true);
+    
+    oracle1(4,3,true);
+    utils.output("---",true);
+    oracle1(4,4,true);
+    utils.output("---",true);
+    oracle1(4,5,true);
+    utils.output("---",true);
+    oracle1(4,6,true);
+    utils.output("---",true);
+    
+    oracle1(6,3,true);
+    utils.output("---",true);
+    oracle1(6,4,true);
+    utils.output("---",true);
+    oracle1(6,5,true);
+    utils.output("---",true);
+    oracle1(6,6,true);
+    utils.output("---",true);
+    
+    oracle1(8,3,true);
+    utils.output("---",true);
+    oracle1(8,4,true);
+    utils.output("---",true);
+    oracle1(8,5,true);
+    utils.output("---",true);
+    oracle1(8,6,true);
+    utils.output("---",true);
+    
+    
 }
 
 
