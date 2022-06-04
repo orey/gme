@@ -15,6 +15,11 @@ function isOdd(n) {
     return n % 2 != 0;
 }
 
+function formatPercentage(x) {
+    return parseFloat(x).toFixed(2)+"%";
+}
+
+
 //=========================================TEST
 
 function test(){
@@ -35,6 +40,7 @@ if (typeof module !== "undefined" && module.exports) {
         output,
         isEven,
         isOdd,
+        formatPercentage,
         test,
     }
 }

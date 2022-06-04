@@ -115,83 +115,89 @@ function oracle1(evalu,tension,verbose=false){
     
 }
 
-function test(){
-    oracle1(0,3,true);
-    utils.output("---",true);
-    oracle1(0,4,true);
-    utils.output("---",true);
-    oracle1(0,5,true);
-    utils.output("---",true);
-    oracle1(0,6,true);
-    utils.output("---",true);
 
-    oracle1(-2,3,true);
-    utils.output("---",true);
-    oracle1(-2,4,true);
-    utils.output("---",true);
-    oracle1(-2,5,true);
-    utils.output("---",true);
-    oracle1(-2,6,true);
-    utils.output("---",true);
+//========================================== Tests
+// excep no re, no re, excep. no, no, yes, exep yes, yes re, excep yes re
+const STATS = [0,0,0,0,0,0,0,0];
 
-    oracle1(-4,3,true);
-    utils.output("---",true);
-    oracle1(-4,4,true);
-    utils.output("---",true);
-    oracle1(-4,5,true);
-    utils.output("---",true);
-    oracle1(-4,6,true);
-    utils.output("---",true);
-    
-    oracle1(-6,3,true);
-    utils.output("---",true);
-    oracle1(-6,4,true);
-    utils.output("---",true);
-    oracle1(-6,5,true);
-    utils.output("---",true);
-    oracle1(-6,6,true);
-    utils.output("---",true);
+function increm(res) {
+    switch(res){
+    case RESULT.EXCEPTIONAL_NO_RANDOM_EVENT:
+        STATS[0] += 1;
+        return;
+    case RESULT.NO_RANDOM_EVENT:
+        STATS[1] += 1;
+        return;
+    case RESULT.EXCEPTIONAL_NO:
+        STATS[2] += 1;
+        return;
+    case RESULT.NO:
+        STATS[3] += 1;
+        return;
+    case RESULT.YES:
+        STATS[4] += 1;
+        return;
+    case RESULT.EXCEPTIONAL_YES:
+        STATS[5] += 1;
+        return;
+    case RESULT.YES_RANDOM_EVENT:
+        STATS[6] += 1;
+        return;
+    case RESULT.EXCEPTIONAL_YES_RANDOM_EVENT:
+        STATS[7] += 1;
+        return;
+    default:
+        utils.output("You should not be here. res = " + res.toString(), true);
+        return;
+    }
+}
 
-    oracle1(2,3,true);
-    utils.output("---",true);
-    oracle1(2,4,true);
-    utils.output("---",true);
-    oracle1(2,5,true);
-    utils.output("---",true);
-    oracle1(2,6,true);
-    utils.output("---",true);
-    
-    oracle1(4,3,true);
-    utils.output("---",true);
-    oracle1(4,4,true);
-    utils.output("---",true);
-    oracle1(4,5,true);
-    utils.output("---",true);
-    oracle1(4,6,true);
-    utils.output("---",true);
-    
-    oracle1(6,3,true);
-    utils.output("---",true);
-    oracle1(6,4,true);
-    utils.output("---",true);
-    oracle1(6,5,true);
-    utils.output("---",true);
-    oracle1(6,6,true);
-    utils.output("---",true);
-    
-    oracle1(8,3,true);
-    utils.output("---",true);
-    oracle1(8,4,true);
-    utils.output("---",true);
-    oracle1(8,5,true);
-    utils.output("---",true);
-    oracle1(8,6,true);
-    utils.output("---",true);
-    
+// total of combinations is 28 = 7 x 4
+const COMBI = 28;
+
+function unit_test(verbose){
+    for (let i=-6;i<=6;i=i+2) {
+        for (let j=3;j<=6;j++) {
+            increm(oracle1(i, j, verbose));
+            utils.output("---",verbose);
+        }
+    }
     
 }
 
+function iter(){
+    const seuil = 10000;
+    for (let i=0;i<seuil;i++)
+        unit_test(false);
+    utils.output(
+        utils.formatPercentage(STATS[0]/seuil/28*100) + ", "
+            + utils.formatPercentage(STATS[1]/seuil/28*100) + ", "
+            + utils.formatPercentage(STATS[2]/seuil/28*100) + ", "
+            + utils.formatPercentage(STATS[3]/seuil/28*100) + ", "
+            + utils.formatPercentage(STATS[4]/seuil/28*100) + ", "
+            + utils.formatPercentage(STATS[5]/seuil/28*100) + ", "
+            + utils.formatPercentage(STATS[6]/seuil/28*100) + ", "
+            + utils.formatPercentage(STATS[7]/seuil/28*100)
+        ,true);
 
+}
+
+function test_simple(){
+    unit_test(true);
+    utils.output(STATS,true);
+    const sum = arr => arr.reduce((a, b) => a + b, 0);
+    if (sum(STATS) == 28)
+        utils.output("OK",true);
+    else
+        utils.output("MARCHE PAS",true);
+}
+
+function test(){
+    //test_simple();
+    iter();
+}
+    
+    
 /*--------------------------------------
  * Exports
  *--------------------------------------*/
