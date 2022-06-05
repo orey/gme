@@ -1,9 +1,30 @@
+/*--------------------------------------------
+Filename: main.js
+Author: https://github.io/orey/gme
+Creation date: June 05 2022
+Under GNU GPL v3 licence
+--------------------------------------------
+Ce fichier est le point d'entrée principal du GME
+
+--------------------------------------------*/
 'use strict';
 
 let dice   = require("./utils/dice.js");
-let utils  = require("./utils/utils.js");
-let oracle = require("./oracles/oracle1.js");
+let utils  = require("./utils/utils.js")
 
+
+/*
+oracle1 et oracle2 ont tous les deux la même interface d'entrée mais pas
+la même interface de sortie
+
+function oracle...(evalu,chaos,verbose=false)
+
+*/
+
+// let oracle = require("./oracles/oracle1.js");
+let oracle = require("./oracles/oracle2.js");
+
+let ea = require("./randomevent/randomevent.js");
 
 //========================================== Adventure
 
