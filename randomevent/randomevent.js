@@ -3,18 +3,7 @@
 const dice  = require("../utils/dice.js");
 const utils = require("../utils/utils.js");
 
-const EVENT_FOCUS_TABLE = [
-    [1, 7, "Evénement distant"],
-    [8, 28, "Action d'un PNJ"],
-    [29, 35, "Introduire un nouveau PNJ"],
-    [36, 45, "Faire avancer une piste"],
-    [46, 52, "Faire reculer une piste"],
-    [56, 67, "Négatif pour un PJ"],
-    [68, 75, "Positif pour un PJ"],
-    [76, 83, "Evénement ambigu"],
-    [84, 92, "Négatif pour un PNJ"],
-    [93, 100, "Positif pour un PNJ"]
-]
+const focus = require("./focus.js");
 
 
 const ACTION = [
@@ -227,21 +216,10 @@ const SENS = [
 function RandomEvent(verbose = false) {
     utils.output("RANDOM EVENT",true);
     // First d100 is for the focus table
-    let focus = dice.roll("1d100");
-    utils.output("Roll = " + focus.toString(),verbose);
-    let found = false;
-    let siz = EVENT_FOCUS_TABLE.length;
-    let inf = 0, sup = 0;
-    let focus_text = "";
-    for (let i=0;i<siz;i++){
-        inf = EVENT_FOCUS_TABLE[i][0];
-        sup = EVENT_FOCUS_TABLE[i][1];
-        if ((focus >= inf) && (focus <= sup)) {
-            focus_text = EVENT_FOCUS_TABLE[i][2];
-            break;
-        }
-    }
-    utils.output("FOCUS: " + focus_text,true);
+    let focusroll = dice.roll("1d100");
+    utils.output("Roll = " + focusroll.toString(),verbose);
+    let myfocus = focus.getFocus(focusroll); // sur la table par défaut
+    utils.output("FOCUS: " + myfocus[1], true);
 
     //reprendre ici
 
