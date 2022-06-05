@@ -26,18 +26,29 @@ let oracle = require("./oracles/oracle2.js");
 
 let ea = require("./randomevent/randomevent.js");
 
+let readlineSync = require('readline-sync');
+
+
+let VERBOSE = true;
+
 //========================================== Adventure
 
 class Adventure {
-    constructor(name) {
-        this._name = name;
-        this._chaos = 5;
-        this._scenes = [];
+    constructor(thename) {
+        utils.out("New Adventure: " + thename);
+        this.name = thename;
+        this.chaos = 5;
+        this.scenes = [];
     }
 
-    get chaos(){
-        return this._chaos;
+    print(){
+        utils.out("Adventure" + this.name);
+        utils.out("Chaos"     + this.chaos);
+        for (let s of this.scenes)
+            s.print();
+        
     }
+    
 
     addScene(sce) {
         this._scenes.push(sce);
@@ -47,49 +58,68 @@ class Adventure {
 
 //========================================== Scene
 
-class Scene {
-    constructor(number, setup) {
-        this._number = number;
-        this._setup = setup;
-        this._altered = "";
-        this._interrupt = "";
-    }
-
-    get number() {
-        return this._number
-    }
-    
+const SCENE_TYPE = {
+    NORMAL:      [1, "normale"],
+    ALTERED:     [2, "altérée"],
+    INTERRUPTED: [3, "interrompue"]
 }
 
+class Scene {
+    constructor(thenumber, thesetup) {
+        this.number = thenumber;
+        this.setup = thesetup;
+        this.descr = ""
+        this.type = SCENE_TYPE.NORMAL;;
+    }
 
-/
+    print(){
+        utils.out("Scene number " + this.number);
+        utils.out("Setup: ");
+        utils.out(this.setup);
+        utils.out("Description: ");
+        utils.out(this.descr);
+    }
 
+}
 
 //========================================== Sequence
 
 function analyzeScene(adv, sce) {
-    let roll = rollDie(10);
-    output("Roll against Chaos: " + roll.toString());
-    if (roll <= adv.chaos) {
-        if (isEven(roll))
-            output("Scene " + sce.number + " interrupt");
+    let myroll = dice.roll("1d10");
+    utils.output("Roll against Chaos: " + myroll.toString(), true);
+    if (myroll <= adv.chaos) {
+        if (utils.isEven(myroll))
+            utils.output("Scene " + sce.number + " interrupt", true);
         else
-            output("Scene " + sce.number + " altered");
+            utils.output("Scene " + sce.number + " altered", true);
     }
     else
-        output("Scene is normal");
+        utils.output("Scene is normal", true);
         
 }
 
 //========================================== Main
 
-function main() {
-    let adv = new Adventure("Il était une fois...");
-    let scene1 = new Scene(1,"Je tente de rentrer dans le jardin grillagé");
-    analyzeScene(adv, scene1);
+const OPTIONS = [
+    "Créer une nouvelle histoire",
+    "Charger une histoire",
+    "Créer une nouvelle scène",
+    "Synthèse de l'histoire en cours",
+    "Sauvegarder l'histoire en cours"
+]
 
+function main() {
+    //let adv = new Adventure("Il était une fois...");
+    //let scene1 = new Scene(1,"Je tente de rentrer dans le jardin grillagé");
+    //analyzeScene(adv, scene1);
+    let choix = 0;
+    while (true) {
+        choix = readlineSync.keyInSelect(OPTIONS, 'Choisissez une option : ');
+        if (choix ==-1) break;
+        console.log('Option choisie : ' + OPTIONS[choix]);
+    }
+    utils.out("Au revoir.");
 }
 
 main()
-testRoll();
-test_oracle1();
+

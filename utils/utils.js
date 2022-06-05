@@ -7,6 +7,11 @@ function output(s, verbose=false){
         console.log(s);
 }
 
+function out(s, verbose = true){
+    if (verbose)
+        console.log(s);
+}
+
 function isEven(n) {
    return n % 2 == 0;
 }
@@ -38,6 +43,7 @@ function test(){
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         output,
+        out,
         isEven,
         isOdd,
         formatPercentage,
