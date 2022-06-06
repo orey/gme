@@ -31,25 +31,68 @@ let readlineSync = require('readline-sync');
 
 let VERBOSE = true;
 
+
+
+const PROMPT = "|> ";
+
+function question(s) {
+    return readlineSync.question(PROMPT + s);
+}
+
+const REP = "~ ";
+
+function reponse(s) {
+    utils.out(REP + s);
+}
+
+function sep(){
+    utils.out("---");
+}
+
+
+//========================================== Document
+
+class Document {
+    descr = [];
+    constructor(firstelem){
+        this.descr.push(firstelem);
+    }
+
+    addLine(elem){
+        this.descr.push(elem);
+    }
+
+    print(){
+        let i = 0;
+        for (let e of this.descr)
+            reponse("[" + (++i).toString() + "] " + e);
+    }
+}
+
 //========================================== Adventure
 
 class Adventure {
-    constructor(thename) {
-        utils.out("New Adventure: " + thename);
+    constructor(thename, descr) {
         this.name = thename;
+        this.descr = new Document(descr);
         this.chaos = 5;
         this.scenes = [];
     }
 
     print(){
-        utils.out("Adventure" + this.name);
-        utils.out("Chaos"     + this.chaos);
-        for (let s of this.scenes)
-            s.print();
+        sep();
+        reponse("Aventure : " + this.name);
+        reponse("Description de l'aventure : ");
+        this.descr.print()
+        reponse("Niveau de chaos : " + this.chaos);
+        if (this.scenes.length > 0) {
+            reponse("Scenes : ");
+            for (let s of this.scenes)
+                s.print();
+        }
         
     }
     
-
     addScene(sce) {
         this._scenes.push(sce);
     }
@@ -73,11 +116,20 @@ class Scene {
     }
 
     print(){
-        utils.out("Scene number " + this.number);
-        utils.out("Setup: ");
-        utils.out(this.setup);
-        utils.out("Description: ");
-        utils.out(this.descr);
+        reponse("Scene number " + this.number);
+        reponse("Setup: ");
+        reponse(this.setup);
+        reponse("Description: ");
+        reponse(this.descr);
+    }
+
+}
+
+//========================================== Piste
+
+class Piste {
+    constructor(lapiste) {
+        this.piste = lapiste;
     }
 
 }
@@ -101,12 +153,19 @@ function analyzeScene(adv, sce) {
 //========================================== Main
 
 const OPTIONS = [
-    "Créer une nouvelle histoire",
-    "Charger une histoire",
-    "Créer une nouvelle scène",
-    "Synthèse de l'histoire en cours",
-    "Sauvegarder l'histoire en cours"
+    "[1] Créer une nouvelle aventure",
+    "[2] Charger une aventure",
+    "[3] Créer une nouvelle scène",
+    "[4] Synthèse de l'histoire en cours",
+    "[5] Sauvegarder l'histoire en cours",
+    "[0] Quitter"
 ]
+
+function mainMenu(){
+    sep();
+    for (let elem of OPTIONS)
+        utils.out(elem);
+}
 
 function main() {
     //let adv = new Adventure("Il était une fois...");
@@ -114,11 +173,27 @@ function main() {
     //analyzeScene(adv, scene1);
     let choix = 0;
     while (true) {
-        choix = readlineSync.keyInSelect(OPTIONS, 'Choisissez une option : ');
-        if (choix ==-1) break;
-        console.log('Option choisie : ' + OPTIONS[choix]);
+        mainMenu();
+        choix = question('Choisissez une option : ');
+        switch(parseInt(choix)){
+        case 0:
+            reponse("Au revoir.");
+            return;
+        case 1:
+            let name = question("Nom de l'aventure : ");
+            let descr = question("Description de l'aventure : ");
+            let av = new Adventure(name, descr);
+            av.print();
+            break;
+        default:
+            reponse("Ce cas n'est pas traité");
+            break;
+            
+            
+        }
+
+        
     }
-    utils.out("Au revoir.");
 }
 
 main()
