@@ -5,7 +5,6 @@ Creation date: June 05 2022
 Under GNU GPL v3 licence
 --------------------------------------------
 Ce fichier est le point d'entrée principal du GME
-
 --------------------------------------------*/
 'use strict';
 
@@ -23,30 +22,31 @@ function oracle...(evalu,chaos,verbose=false)
 
 // let oracle = require("./oracles/oracle1.js");
 let oracle = require("./oracles/oracle2.js");
-
 let ea = require("./randomevent/randomevent.js");
 
+// Utils for the command line
 let readlineSync = require('readline-sync');
-
+let clear = require('clear');
 
 let VERBOSE = true;
 
 
+//========================================== Print
 
-const PROMPT = "|> ";
+const PROMPT = "~ ";
 
 function question(s) {
     return readlineSync.question(PROMPT + s);
 }
 
-const REP = "~ ";
+const REP = "> ";
 
 function reponse(s) {
     utils.out(REP + s);
 }
 
 function sep(){
-    utils.out("---");
+    utils.out("==============================================");
 }
 
 
@@ -175,6 +175,7 @@ function main() {
     while (true) {
         mainMenu();
         choix = question('Choisissez une option : ');
+        clear();
         switch(parseInt(choix)){
         case 0:
             reponse("Au revoir.");
