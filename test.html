@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+    <title>GME</title>
+    <meta charset="UTF-8">
+    <style>
+      th, td {
+          border: 1px solid;
+      };
+    </style>
+    <script src="./classes.js"></script>
+    <script language="JavaScript">
+    </script>
+  </head>
+  <body>
+    <form>
+      <label><b>Enter a message</b></label><br/>
+      <input type="text" name="message" id="user_input"><br/>
+      <label><b>Enter a long message</b></label><br/>
+      <textarea name="text" id="long_text" rows="10" cols="30">
+        The cat was playing in the garden.
+      </textarea> 
+    </form>
+    
+    <input type="submit" onclick="showInput();"><br/>
+    <label>Your input: </label>
+    <p><span id='display'></span></p>
+    <hr>
+    <h2>Zone liste</h2>
+    <input type="submit" onclick="writeInZone('zoneliste',DOCS.toHTML());"><br/>
+    <div id="zoneliste"></div>
+    <h2>Zone édition</h2>
+    <div id="zoneedition"></div>    
+  </body>
+</html>
