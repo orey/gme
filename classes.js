@@ -8,6 +8,16 @@ Classes du GME
 --------------------------------------------*/
 'use strict';
 
+const VERBOSE= true;
+
+const myconsole = {
+    log: function(s){
+        if (VERBOSE)
+            console.log(s);
+    }
+}
+
+//============================= UTILS
 
 function func() {
     return ( ( ( 1+Math.random() ) * 0x10000 ) | 0 ).toString( 16 ).substring( 1 );
@@ -19,6 +29,18 @@ function createUUID() {
             + func().substr(0,2) + "-" + func()
             + "-" + func() + func() + func()).toLowerCase();
 }
+
+//============================= HTML ZONES
+
+function writeInZone(zone, text){
+    document.getElementById(zone).innerHTML = text;
+}
+
+function cleanZone(zone){
+    document.getElementById(zone).innerHTML = "";
+}
+
+//============================= CONSTANTS
 
 const TYPE = {
     SCENE: "Scène",
@@ -34,7 +56,7 @@ const STATUS = {
 
 //============================= Document
 class Document {
-    constructor(type, title, sequence, descr = "", status = "", alternate = ""){
+    constructor(type, title, sequence, descr = "", status = STATUS.NORMAL, alternate = ""){
         this.id = createUUID();
         this.type = type;
         this.title = title;
@@ -214,7 +236,7 @@ function listeDocsToHtml(myliste){
 
 function editDoc(id){
     let e = DOCS.getElemById(id);
-    console.log(e);
+    myconsole.log(e);
     if (e.type != TYPE.SCENE)
         writeInZone('zoneedition', `
 <table>
@@ -237,11 +259,9 @@ function editDoc(id){
   <label>Nom</label><br/>
   <input type="text" id="edit_title" value='${e.title}'><br/>
   <label>Description</label><br/>
-  <textarea name="text" id="edit_descr" rows="20" cols="50">
-    ${e.descr}
-  </textarea>
+  <textarea name="text" id="edit_descr" rows="20" cols="50">${e.descr}</textarea>
 </form>
-<input type="submit" onclick="updateDoc();"><br/>
+<input type="submit" value="Mettre à jour" onclick="updateDoc('${e.id}');"><br/>
 `);
     else
         writeInZone('zoneedition', `
@@ -263,39 +283,36 @@ function editDoc(id){
 </table>
 <form>
   <label>Nom</label><br/>
-  <input type="text" id="edit_title">
-    ${e.title}
-  </input><br/>
+  <input type="text" id="edit_title" value='${e.title}'><br/>
   <label>Description</label><br/>
-  <textarea name="text" id="edit_descr" rows="20" cols="50">
-    ${e.descr}
-  </textarea><br/>`
+  <textarea name="text" id="edit_descr" rows="20" cols="50">${e.descr}</textarea><br/>`
         + getRadioButtons(e)
         + `
   <br/><label>Alternative</label><br/>
-  <textarea name="text" id="edit_alternate" rows="20" cols="50">
-    ${e.alternate}
-  </textarea>
-</form>
-<input type="submit" onclick="updateDoc(e.id);"><br/>
+  <textarea name="text" id="edit_alternate" rows="20" cols="50">${e.alternate}</textarea>
+</form><br/>
+<input type="submit" value="Mettre à jour" onclick="updateDoc('${e.id}');"><br/>
 `);
 
 }
 
 function getRadioButtons(e){
     return `
-<input type="radio" id="edit_status_normal" value="NORMAL"`
+<form>
+<p>Statut</p>
+<input type="radio" id="edit_status_normal" name="status" value="${STATUS.NORMAL}"`
         + (e.status == STATUS.NORMAL ? " checked" : "")
         + `
 ><label for="edit_status_normal">${STATUS.NORMAL}</label><br>
-<input type="radio" id="edit_status_alteree" value="ALTEREE"`
+<input type="radio" id="edit_status_alteree" name="status" value="${STATUS.ALTEREE}"`
         + (e.status == STATUS.ALTEREE ? " checked" : "")
         + `
 ><label for="edit_status_alteree">${STATUS.ALTEREE}</label><br>
-<input type="radio" id="edit_status_interrompue" value="INTERROMPUE"`
+<input type="radio" id="edit_status_interrompue" name="status" value="${STATUS.INTERROMPUE}"`
         + (e.status == STATUS.INTERROMPUE ? " checked" : "")
         + `
 ><label for="edit_status_interrompue">${STATUS.INTERROMPUE}</label> 
+</form>
 `;
 }
 
@@ -304,18 +321,46 @@ function updateDoc(id){
     // get title
     e.title = document.getElementById("edit_title").value;
     e.descr = document.getElementById("edit_descr").value;
+    myconsole.log(e);
     if (e.type == TYPE.SCENE) {
-        let temp =  document.getElementById("edit_status_normal").value;
-        console.log(temp);
-        temp =  document.getElementById("edit_status_alteree").value;
-        console.log(temp);
-        temp =  document.getElementById("edit_status_interrompue").value;
-        console.log(temp);
+        let ele = document.getElementsByName('status');
+        for (let i = 0; i < ele.length; i++) {
+            if(ele[i].checked)
+                e.status = ele[i].value;
+        }
         e.alternate = document.getElementById("edit_alternate").value;
     }
+    cleanZone('zoneedition');
+    refresh();
 
 }
 
+//========================================================= Export
+function jsonExport(){
+    return JSON.stringify(DOCS);
+}
+
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+// Start file download.
+document.getElementById("dwn-btn").addEventListener("click", function(){
+    // Generate download of hello.txt file with some content
+    var text = jsonExport();
+    var filename = "histoire.json";
+    
+    download(filename, text);
+}, false);
 
 //========================================================= DATA
 const DOCS = new ListeDocs();
@@ -338,18 +383,13 @@ DOCS.push(new Document(TYPE.SCENE,"Démarrage",4, "Parama", STATUS.ALTEREE));
 DOCS.push(new Document(TYPE.SCENE,"Démarrage",5, "Surprise à la Cour du roi Loth", STATUS.INTERROMPUE, "blahuche"));
 
 
-console.log(createUUID());
-console.log(DOCS);
-function showInput() {
-    document.getElementById('display').innerHTML = 
-        document.getElementById("user_input").value
-        + "<hr>"
-        + document.getElementById("long_text").value;
-}
-function writeInZone(zone, text){
-    document.getElementById(zone).innerHTML = text;
+myconsole.log(createUUID());
+myconsole.log(DOCS);
+
+function refresh() {
+    writeInZone('zoneliste',DOCS.toHTML());
 }
 
-
+refresh();
 
 
