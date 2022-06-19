@@ -3,21 +3,556 @@
   <head lang="en">
     <title>GME</title>
     <meta charset="UTF-8">
+    <!--=================================================-->
+    <!--================== CSS= =========================-->
+    <!--=================================================-->
     <style>
       th, td {
           border: 1px solid;
       };
     </style>
   </head>
+  <!--=================================================-->
+  <!--================== HTML =========================-->
+  <!--=================================================-->
   <body>
     <h2>Zone liste</h2>
     <!--<input type="submit" onclick="writeInZone('zoneliste',DOCS.toHTML());"><br/>-->
     <div id="zoneliste"></div>
     <br>
     <input type="button" id="dwn-btn" value="Télécharger l'histoire au format JSON"/>
+    <br>
+    <br>
+    <label for="myfile">Pour continuer une histoire existante, uploader un fichier json</label><br>
+    <input type="file" accept=".json" onchange="previewFile()"><br>
     <h2>Zone édition</h2>
     <div id="zoneedition"></div>    
   </body>
-  <script src="./classes.js"></script>
-  <script language="JavaScript"></script>
+  <!--=================================================-->
+  <!--================== CODE =========================-->
+  <!--=================================================-->
+  <script language="JavaScript">
+    /*--------------------------------------------
+     Author: https://github.io/orey/gme
+     Creation date: June 18 2022
+     Under GNU GPL v3 licence
+     --------------------------------------------
+     Script complet du GME
+--------------------------------------------*/
+    'use strict';
+
+    const VERBOSE= true;
+
+    const myconsole = {
+        log: function(s){
+            if (VERBOSE)
+                console.log(s);
+        }
+    }
+
+    //============================= UTILS
+
+    function func() {
+        return ( ( ( 1+Math.random() ) * 0x10000 ) | 0 ).toString( 16 ).substring( 1 );
+    }
+    
+    function createUUID() {
+        // For calling it, stitch '3' in the 3rd group
+        return (func() + func() + "-" + func() + "-3"
+                + func().substr(0,2) + "-" + func()
+                + "-" + func() + func() + func()).toLowerCase();
+    }
+
+    //============================= HTML ZONES
+
+    function writeInZone(zone, text){
+        document.getElementById(zone).innerHTML = text;
+    }
+
+    function cleanZone(zone){
+        document.getElementById(zone).innerHTML = "";
+    }
+
+    //============================= CONSTANTS
+
+    const TYPE = {
+        SCENE: "Scène",
+        PNJ: "PNJ",
+        PISTE: "Piste"
+    }
+
+    const STATUS = {
+        NORMAL: "Normal",
+        ALTEREE: "Altérée",
+        INTERROMPUE: "Interrompue"
+    }
+
+    //============================= Document
+    class Document {
+        constructor(type,
+                    title,
+                    sequence,
+                    descr = "",
+                    status = STATUS.NORMAL,
+                    alternate = "",
+                    id = createUUID()) {
+            this.id = id;
+            this.type = type;
+            this.title = title;
+            this.sequence = sequence;
+            this.descr = descr;
+            this.status = status;
+            this.alternate = alternate;
+        }
+        
+        setStatus(status){
+            this.status = status; // pour les scènes
+        }
+
+        setAlternate(alternate){
+            this.alternate = alternate; // pour les scènes
+        }
+
+        toHTML() {
+            return documentToHTML(this);
+        }
+        
+        toTableLine() {
+            return documentToTableLine(this);
+        }
+    }
+
+    // Not used
+    function documentJsonConstructor(jstr){
+        let temp = JSON.parse(jstr);
+        return new Document(temp.type,
+                            temp.title,
+                            temp.sequence,
+                            temp.descr,
+                            temp.status,
+                            temp.alternate,
+                            temp.id);
+    }
+
+    
+    //============================= ListeDocs
+    class ListeDocs {
+        liste = [];
+
+        constructor() {}
+
+        push(elem) {
+            this.liste.push(elem);
+        }
+
+        toHTML(){
+            return listeDocsToHtml(this);
+        }
+
+        getElemById(id) {
+            for (let e of this.liste)
+                if (e.id == id)
+                    return e;
+        }
+
+        getNextSeqNum(type) {
+            let temp = 0;
+            for (let e of this.liste) {
+                if (e.type == type)
+                    temp = temp > e.sequence ? temp : e.sequence;
+            }
+            return temp+1;
+        }
+    }
+
+    function listeDocsJsonConstructor(jstr){
+        let temp = JSON.parse(jstr);
+        let mylist = new ListeDocs();
+        for (let el of temp.liste)
+            mylist.push(new Document(el.type,
+                                     el.title,
+                                     el.sequence,
+                                     el.descr,
+                                     el.status,
+                                     el.alternate,
+                                     el.id));
+        return mylist;
+    }
+
+    //================================================== Document display
+
+    function documentToHTML(doc){
+        let output = `
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Sequence</th>
+      <th>Title</th>
+`;
+        if (doc.type == TYPE.SCENE)
+            output += `<th>Status</th>`;
+        output += `
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>${doc.type}</td>
+      <td>${doc.sequence}</td>
+      <td>${doc.title}</td>
+`;
+        if (doc.type == TYPE.SCENE)
+            output += `<td>${doc.status}</td>`;
+        output += `
+    </tr>
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>Description</th>
+`;
+        if (doc.type == TYPE.SCENE)
+            output += `<th>Alternative</th>`;
+        output += `
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>${doc.descr}</td>
+`;
+        if (doc.type == TYPE.SCENE)
+            output += `<td>${doc.alternate}</td>`;
+        output += `
+    </tr>
+  </tbody>
+</table>
+`;
+        return output;
+    }
+
+    function documentToTableLine(doc){
+        let output =
+            `<td>${doc.type}</td>
+<td>${doc.sequence}</td>
+<td>${doc.title}</td>
+<td>${doc.descr}</td>
+`;
+        if (doc.type == TYPE.SCENE)
+            output += `<td>${doc.status}</td><td>${doc.alternate}</td>`;
+        return output;
+    }
+
+
+    //================================================== List of documents display
+
+    // Envoie vers editDoc(doc.id)
+    function listeDocsToHtml(myliste){
+        // nous parcourons les 3 types de doc
+        let outputpnj =
+            `
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Séquence</th>
+      <th>Nom</th>
+      <th>Description</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+`;
+        let outputpistes = outputpnj;
+        let outputscenes =
+            `
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Séquence</th>
+      <th>Nom</th>
+      <th>Description</th>
+      <th>Statut</th>
+      <th>Alternative</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+`;
+        for (let e of myliste.liste){
+            if (e.type == TYPE.PNJ)
+                outputpnj += "<tr>" + e.toTableLine()
+                + `<td><input value="Editer" type="submit" onclick="editDoc('${e.id}');"></td></tr>`;
+            if (e.type == TYPE.PISTE)
+                outputpistes += "<tr>" + e.toTableLine()
+                + `<td><input value="Editer" type="submit" onclick="editDoc('${e.id}');"></td></tr>`;
+            if (e.type == TYPE.SCENE)
+                outputscenes += "<tr>" + e.toTableLine()
+                + `<td><input value="Editer" type="submit" onclick="editDoc('${e.id}');"></td></tr>`;
+        }
+        outputpnj += `
+  </tbody>
+</table>
+<input value="Nouveau PNJ" type="submit" onclick="createDoc('${TYPE.PNJ}');"><br>
+`;
+        outputpistes += `
+  </tbody>
+</table>
+<input value="Nouvelle piste" type="submit" onclick="createDoc('${TYPE.PISTE}');"><br>
+`;
+        outputscenes += `
+  </tbody>
+</table>
+<input value="Nouvelle scene" type="submit" onclick="createDoc('${TYPE.SCENE}');"><br>
+`;
+        let separator = "<br/>";
+        return outputscenes + separator + outputpnj + separator + outputpistes;
+    }
+
+    //================================================== Creation d'un doc
+    // A la création, la scène est normale (sans radiobuttons ou alternate)
+
+    function createDoc(type){
+        TEMP = new Document(type,
+                            "",
+                            DOCS.getNextSeqNum(type));
+        
+        writeInZone('zoneedition', `
+<table>
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Type</th>
+      <th>Sequence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>${TEMP.id}</td>
+      <td>${TEMP.type}</td>
+      <td>${TEMP.sequence}</td>
+    </tr>
+  </tbody>
+</table>
+<form>
+  <label>Nom</label><br/>
+  <input type="text" id="edit_title" value='${TEMP.title}'><br/>
+  <label>Description</label><br/>
+  <textarea name="text" id="edit_descr" rows="20" cols="50">${TEMP.descr}</textarea>
+</form>
+<input type="submit" value="Créer" onclick="createNewDoc();">
+<input type="submit" value="Annuler" onclick="cleanZone('zoneedition');">
+<br/>
+`);
+    }
+
+    function createNewDoc() {
+        // get values
+        TEMP.title = document.getElementById("edit_title").value;
+        TEMP.descr = document.getElementById("edit_descr").value;
+        myconsole.log(TEMP);
+        DOCS.push(TEMP);
+        TEMP = null;
+        cleanZone('zoneedition');
+        refresh();
+    }
+
+    //================================================== Edition d'un doc
+ 
+    function editDoc(id){
+        let e = DOCS.getElemById(id);
+        myconsole.log(e);
+        if (e.type != TYPE.SCENE)
+            writeInZone('zoneedition', `
+<table>
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Type</th>
+      <th>Sequence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>${e.id}</td>
+      <td>${e.type}</td>
+      <td>${e.sequence}</td>
+    </tr>
+  </tbody>
+</table>
+<form>
+  <label>Nom</label><br/>
+  <input type="text" id="edit_title" value='${e.title}'><br/>
+  <label>Description</label><br/>
+  <textarea name="text" id="edit_descr" rows="20" cols="50">${e.descr}</textarea>
+</form>
+<input type="submit" value="Mettre à jour" onclick="updateDoc('${e.id}');">
+<input type="submit" value="Annuler" onclick="cleanZone('zoneedition');">
+<br/>
+`);
+        else
+            writeInZone('zoneedition', `
+<table>
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Type</th>
+      <th>Sequence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>${e.id}</td>
+      <td>${e.type}</td>
+      <td>${e.sequence}</td>
+    </tr>
+  </tbody>
+</table>
+<form>
+  <label>Nom</label><br/>
+  <input type="text" id="edit_title" value='${e.title}'><br/>
+  <label>Description</label><br/>
+  <textarea name="text" id="edit_descr" rows="20" cols="50">${e.descr}</textarea><br/>`
+                        + getRadioButtons(e)
+                        + `
+  <br/><label>Alternative</label><br/>
+  <textarea name="text" id="edit_alternate" rows="20" cols="50">${e.alternate}</textarea>
+</form><br/>
+<input type="submit" value="Mettre à jour" onclick="updateDoc('${e.id}');">
+<input type="submit" value="Annuler" onclick="cleanZone('zoneedition');">
+<br/>
+`);
+
+    }
+
+    function getRadioButtons(e){
+        return `
+<form>
+<p>Statut</p>
+<input type="radio" id="edit_status_normal" name="status" value="${STATUS.NORMAL}"`
+            + (e.status == STATUS.NORMAL ? " checked" : "")
+            + `
+><label for="edit_status_normal">${STATUS.NORMAL}</label><br>
+<input type="radio" id="edit_status_alteree" name="status" value="${STATUS.ALTEREE}"`
+            + (e.status == STATUS.ALTEREE ? " checked" : "")
+            + `
+><label for="edit_status_alteree">${STATUS.ALTEREE}</label><br>
+<input type="radio" id="edit_status_interrompue" name="status" value="${STATUS.INTERROMPUE}"`
+            + (e.status == STATUS.INTERROMPUE ? " checked" : "")
+            + `
+><label for="edit_status_interrompue">${STATUS.INTERROMPUE}</label> 
+</form>
+`;
+    }
+
+    function updateDoc(id){
+        let e = DOCS.getElemById(id);
+        // get title
+        e.title = document.getElementById("edit_title").value;
+        e.descr = document.getElementById("edit_descr").value;
+        myconsole.log(e);
+        if (e.type == TYPE.SCENE) {
+            let ele = document.getElementsByName('status');
+            for (let i = 0; i < ele.length; i++) {
+                if(ele[i].checked)
+                    e.status = ele[i].value;
+            }
+            e.alternate = document.getElementById("edit_alternate").value;
+        }
+        cleanZone('zoneedition');
+        refresh();
+
+    }
+
+    //========================================================= Export
+    function jsonExport(){
+        return JSON.stringify(DOCS);
+    }
+
+    function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+
+    // Start file download.
+    document.getElementById("dwn-btn").addEventListener("click", function(){
+        // Generate download of hello.txt file with some content
+        var text = jsonExport();
+        var filename = "histoire.json";
+        
+        download(filename, text);
+    }, false);
+
+    //========================================================= Import a json file
+
+/*    const uploadedfile = document.getElementById('myfile');
+    const upload = document.getElementById('upload');
+    const uploadstatus = document.getElementById('status');
+    upload.addEventListener('click', () => {
+        console.log('clicked the upload button!');
+        const fileReader = new FileReader(); // initialize the object  
+        fileReader.readAsText(uploadedfile.files[0]); // read file as array buffer
+        fileReader.onload = (event) => {
+            console.log('Complete File read successfully!')
+        }
+    });*/
+    
+    function previewFile() {
+        const content = document.querySelector('.content');
+        const [file] = document.querySelector('input[type=file]').files;
+        const reader = new FileReader();
+        
+        reader.addEventListener("load", () => {
+            // this will then display a text file on the console
+            myconsole.log(reader.result);
+            DOCS = listeDocsJsonConstructor(reader.result);
+            refresh();
+        }, false);
+        
+        if (file) {
+            reader.readAsText(file);
+        }
+    }
+
+    
+    //========================================================= DATA
+    let DOCS = new ListeDocs();
+    let TEMP = null; 
+
+    DOCS.push(new Document(TYPE.PNJ,"Johnny Go",1, "C'est ma vie"));
+    DOCS.push(new Document(TYPE.PNJ,"Fada Complet",2, "Rouboudou"));
+    DOCS.push(new Document(TYPE.PNJ,"Pas Glop",3, "Fantastique"));
+    DOCS.push(new Document(TYPE.PNJ,"Mister President",4, "Schtroumph grognon"));
+    DOCS.push(new Document(TYPE.PNJ,"Spider Boy",5, "Ca colle"));
+
+    DOCS.push(new Document(TYPE.PISTE,"Les Broutons",1, "Blache"));
+    DOCS.push(new Document(TYPE.PISTE,"Le portail",2, "blouche"));
+    DOCS.push(new Document(TYPE.PISTE,"La forêt",3, "Falamase"));
+    DOCS.push(new Document(TYPE.PISTE,"Qui est Caïus ?",4, "Heptagone"));
+
+    DOCS.push(new Document(TYPE.SCENE,"Démarrage",1, "C'est le départ"));
+    DOCS.push(new Document(TYPE.SCENE,"Ensuite",2, "Scène 2"));
+    DOCS.push(new Document(TYPE.SCENE,"Démarrage",3, "Fouchtra"));
+    DOCS.push(new Document(TYPE.SCENE,"Démarrage",4, "Parama", STATUS.ALTEREE));
+    DOCS.push(new Document(TYPE.SCENE,"Démarrage",5, "Surprise à la Cour du roi Loth", STATUS.INTERROMPUE, "blahuche"));
+
+
+    myconsole.log(createUUID());
+    myconsole.log(DOCS);
+
+    function refresh() {
+        writeInZone('zoneliste',DOCS.toHTML());
+    }
+
+    refresh();
+  </script>
 </html>
