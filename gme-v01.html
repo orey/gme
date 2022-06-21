@@ -9,42 +9,13 @@
     <style>
       th, td {
           border: 1px solid;
-      }
-      span.mybold {
-          font-weight: bold;
-      }
+      };
     </style>
   </head>
   <!--=================================================-->
   <!--================== HTML =========================-->
   <!--=================================================-->
   <body>
-    <h1>Game Master Emulator</h1>
-    <h2>Lanceur de dés</h2>
-    <div id="dice">
-      <form>
-        <label>Nombre</label>
-        <input type="text" id="dice-number">
-        <input type="radio" id="dice-d4" name="choicechoice" value="4">
-        <label>d4</label>
-        <input type="radio" id="dice-d6" name="choicechoice" value="6">
-        <label>d6</label>
-        <input type="radio" id="dice-d8" name="choicechoice" value="8">
-        <label>d8</label>
-        <input type="radio" id="dice-d10" name="choicechoice" value="10">
-        <label>d10</label>
-        <input type="radio" id="dice-d12" name="choicechoice" value="12">
-        <label>d12</label>
-        <input type="radio" id="dice-d20" name="choicechoice" value="20">
-        <label>d20</label>
-        <input type="radio" id="dice-d100" name="choicechoice" value="100" checked>
-        <label>d100</label>
-        <label>+</label>
-        <input type="text" id="dice-pips"><br/>
-      </form>
-      <input type="submit" value="Lancer" onclick="throwDice();"><br>
-      <div id="dice-result"></div>
-    </div>
     <h2>Zone liste</h2>
     <!--<input type="submit" onclick="writeInZone('zoneliste',DOCS.toHTML());"><br/>-->
     <div id="zoneliste"></div>
@@ -78,48 +49,7 @@
                 console.log(s);
         }
     }
-    //======================================= DICE
 
-    function rollDie(faces){
-        return Math.floor((Math.random()*faces)+1);
-    }
-
-    // Dice roller
-    function roll(number, faces, pips){
-        let result = pips;
-        let temp = 0;
-        for (let i=0;i<number;i++){
-            temp = rollDie(faces);
-            result += temp;
-        }
-        return result;
-    }
-
-    function throwDice(){
-        let number = document.getElementById("dice-number").value;
-        let mynumber = 1;
-        if (number != "")
-            mynumber = parseInt(number);
-        let pips = document.getElementById("dice-pips").value;
-        let mypips = 0;
-        if (pips != "")
-            mypips = parseInt(pips);
-        let ele = document.getElementsByName('choicechoice');
-        let faces = "";
-        for (let i = 0; i < ele.length; i++) {
-            if(ele[i].checked)
-                faces = ele[i].value;
-        }
-        myconsole.log(number + "d" + 
-                      faces + "+" +
-                      pips);
-        writeInZone('dice-result', "Résultat : <span class='mybold'>" +
-                    roll(mynumber,parseInt(faces),mypips).toString() +
-                   "</span>");
-        refresh();
-    }
-
-    
     //============================= UTILS
 
     function func() {
@@ -257,7 +187,7 @@
   <thead>
     <tr>
       <th>Type</th>
-      <th>n°</th>
+      <th>Sequence</th>
       <th>Title</th>
 `;
         if (doc.type == TYPE.SCENE)
@@ -301,12 +231,9 @@
         return output;
     }
 
-    function documentToTableLine(doc, withtype=false){
-        let output = "";
-        if (withtype)
-            output = `<td>${doc.type}</td>`;
-        output +=
-            `
+    function documentToTableLine(doc){
+        let output =
+            `<td>${doc.type}</td>
 <td>${doc.sequence}</td>
 <td>${doc.title}</td>
 <td>${doc.descr}</td>
@@ -322,12 +249,13 @@
     // Envoie vers editDoc(doc.id)
     function listeDocsToHtml(myliste){
         // nous parcourons les 3 types de doc
-        let header =
+        let outputpnj =
             `
 <table>
   <thead>
     <tr>
-      <th>n°</th>
+      <th>Type</th>
+      <th>Séquence</th>
       <th>Nom</th>
       <th>Description</th>
       <th>Action</th>
@@ -335,15 +263,14 @@
   </thead>
   <tbody>
 `;
-        let outputpnj = "<h3>PNJ</h3>" + header;
-        let outputpistes = "<h3>Pistes</h3>" + header;
+        let outputpistes = outputpnj;
         let outputscenes =
             `
-<h3>Scènes</h3>
 <table>
   <thead>
     <tr>
-      <th>n°</th>
+      <th>Type</th>
+      <th>Séquence</th>
       <th>Nom</th>
       <th>Description</th>
       <th>Statut</th>
