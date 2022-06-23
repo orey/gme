@@ -7,41 +7,6 @@
     <!--================== CSS= =========================-->
     <!--=================================================-->
     <style>
-      html, body {
-          margin: 0;
-          padding: 0;
-      }
-      .container {
-          width: 100%;
-          position: relative;
-      }
-      .leftMenu {
-          background-color: #333;
-          color: #FFF;
-          height: 200px; /* for demo purposes */
-          width: 120px;
-          position: relative;
-      }
-      .middle {
-          background-color: #CCC;
-          color: #FFF;
-          padding: 10px;
-          position: absolute;
-          left: 120px;
-          right: 0;
-      }
-      .bottomSection {
-          background-color: #CCC;
-          color: #FFF;
-          padding: 10px;
-          position: absolute;
-          left: 120px;
-          right: 0;
-      }
-      .leftMenu, .middle, .bottomSection {
-          display: inline-block;
-          vertical-align: top;
-      }
       th, td {
           border: 1px solid;
       }
@@ -54,49 +19,43 @@
   <!--================== HTML =========================-->
   <!--=================================================-->
   <body>
-    <div class="container">
-      <div class="leftMenu">Menu</div>
-      <div class="middle">
-        <h1>Game Master Emulator</h1>
-        <h2>Lanceur de dés</h2>
-        <div id="dice">
-          <form>
-            <label>Nombre</label>
-            <input type="text" id="dice-number">
-            <input type="radio" id="dice-d4" name="choicechoice" value="4">
-            <label>d4</label>
-            <input type="radio" id="dice-d6" name="choicechoice" value="6">
-            <label>d6</label>
-            <input type="radio" id="dice-d8" name="choicechoice" value="8">
-            <label>d8</label>
-            <input type="radio" id="dice-d10" name="choicechoice" value="10">
-            <label>d10</label>
-            <input type="radio" id="dice-d12" name="choicechoice" value="12">
-            <label>d12</label>
-            <input type="radio" id="dice-d20" name="choicechoice" value="20">
-            <label>d20</label>
-            <input type="radio" id="dice-d100" name="choicechoice" value="100" checked>
-            <label>d100</label>
-            <label>+</label>
-            <input type="text" id="dice-pips"><br/>
-          </form>
-          <input type="submit" value="Lancer" onclick="throwDice();"><br>
-          <div id="dice-result"></div>
-        </div>
-        <h2>Zone liste</h2>
-        <!--<input type="submit" onclick="writeInZone('zoneliste',DOCS.toHTML());"><br/>-->
-        <div id="zoneliste"></div>
-        <br>
-        <input type="button" id="dwn-btn" value="Télécharger l'histoire au format JSON"/>
-        <br>
-        <br>
-        <label for="myfile">Pour continuer une histoire existante, uploader un fichier json</label><br>
-        <input type="file" accept=".json" onchange="previewFile()"><br>
-        <h2>Zone édition</h2>
-        <div id="zoneedition"></div>
-      </div>
-      <div class="bottomSection"></div>
-    </div><!--container-->
+    <h1>Game Master Emulator</h1>
+    <h2>Lanceur de dés</h2>
+    <div id="dice">
+      <form>
+        <label>Nombre</label>
+        <input type="text" id="dice-number">
+        <input type="radio" id="dice-d4" name="choicechoice" value="4">
+        <label>d4</label>
+        <input type="radio" id="dice-d6" name="choicechoice" value="6">
+        <label>d6</label>
+        <input type="radio" id="dice-d8" name="choicechoice" value="8">
+        <label>d8</label>
+        <input type="radio" id="dice-d10" name="choicechoice" value="10">
+        <label>d10</label>
+        <input type="radio" id="dice-d12" name="choicechoice" value="12">
+        <label>d12</label>
+        <input type="radio" id="dice-d20" name="choicechoice" value="20">
+        <label>d20</label>
+        <input type="radio" id="dice-d100" name="choicechoice" value="100" checked>
+        <label>d100</label>
+        <label>+</label>
+        <input type="text" id="dice-pips"><br/>
+      </form>
+      <input type="submit" value="Lancer" onclick="throwDice();"><br>
+      <div id="dice-result"></div>
+    </div>
+    <h2>Zone liste</h2>
+    <!--<input type="submit" onclick="writeInZone('zoneliste',DOCS.toHTML());"><br/>-->
+    <div id="zoneliste"></div>
+    <br>
+    <input type="button" id="dwn-btn" value="Télécharger l'histoire au format JSON"/>
+    <br>
+    <br>
+    <label for="myfile">Pour continuer une histoire existante, uploader un fichier json</label><br>
+    <input type="file" accept=".json" onchange="previewFile()"><br>
+    <h2>Zone édition</h2>
+    <div id="zoneedition"></div>    
   </body>
   <!--=================================================-->
   <!--================== CODE =========================-->
