@@ -7,46 +7,58 @@
     <!--================== CSS= =========================-->
     <!--=================================================-->
     <style>
-      html, body {
+      * {
+          box-sizing: border-box;
+      }
+      body {
+          background-color: white;
+      }
+
+      .header, .footer {
+          background-color: grey;
+          color: white;
+          padding: 15px;
+      }
+
+      .column {
+          float: left;
+          padding: 15px;
+      }
+
+      .clearfix::after {
+          content: "";
+          clear: both;
+          display: table;
+      }
+
+      .menu {
+          width: 15%;
+      }
+
+      .content {
+          width: 85%;
+          background-color: white;
+      }
+
+      .menu ul {
+          list-style-type: none;
           margin: 0;
           padding: 0;
       }
-      .container {
-          width: 100%;
-          position: relative;
+
+      .menu li {
+          padding: 8px;
+          margin-bottom: 8px;
+          background-color: #33b5e5;
+          color: #ffffff;
       }
-      .leftMenu {
-          background-color: #333;
-          color: #FFF;
-          height: 200px; /* for demo purposes */
-          width: 120px;
-          position: relative;
-      }
-      .middle {
-          background-color: #CCC;
-          color: #FFF;
-          padding: 10px;
-          position: absolute;
-          left: 120px;
-          right: 0;
-      }
-      .bottomSection {
-          background-color: #CCC;
-          color: #FFF;
-          padding: 10px;
-          position: absolute;
-          left: 120px;
-          right: 0;
-      }
-      .leftMenu, .middle, .bottomSection {
-          display: inline-block;
-          vertical-align: top;
+
+      .menu li:hover {
+          background-color: #0099cc;
       }
       th, td {
-          border: 1px solid;
-      }
-      span.mybold {
-          font-weight: bold;
+          background-color: #33b5e5;
+          color: #ffffff;
       }
     </style>
   </head>
@@ -54,10 +66,20 @@
   <!--================== HTML =========================-->
   <!--=================================================-->
   <body>
-    <div class="container">
-      <div class="leftMenu">Menu</div>
-      <div class="middle">
-        <h1>Game Master Emulator</h1>
+    <div class="header">
+      <h1>Game Master Emulator</h1>
+    </div>
+
+    <div class="clearfix">
+      <div class="column menu">
+        <ul>
+          <li>The Flight</li>
+          <li>The City</li>
+          <li>The Island</li>
+          <li>The Food</li>
+        </ul>
+      </div>
+      <div class="column content">
         <h2>Lanceur de dés</h2>
         <div id="dice">
           <form>
@@ -92,10 +114,12 @@
         <br>
         <label for="myfile">Pour continuer une histoire existante, uploader un fichier json</label><br>
         <input type="file" accept=".json" onchange="previewFile()"><br>
-        <h2>Zone édition</h2>
+       <h2>Zone édition</h2>
         <div id="zoneedition"></div>
       </div>
-      <div class="bottomSection"></div>
+      <div class="footer">
+        <p>Copyright Olivier Rey 2022</p>
+      </div>
     </div><!--container-->
   </body>
   <!--=================================================-->
