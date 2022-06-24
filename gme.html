@@ -49,16 +49,22 @@
       .menu li {
           padding: 8px;
           margin-bottom: 8px;
-          background-color: #33b5e5;
+          background-color: #4d4d4d;
           color: #ffffff;
       }
 
       .menu li:hover {
-          background-color: #0099cc;
+          background-color: #999999;
       }
-      th, td {
-          background-color: #33b5e5;
+      /*th, td {
+          background-color: #3333FF;
           color: #ffffff;
+      }*/
+      thead {
+          background-color: darkgrey;
+      }
+      tr:nth-child(even) {
+          background-color: #d6d6d6;
       }
     </style>
   </head>
@@ -108,11 +114,11 @@
         <h2>Zone liste</h2>
         <!--<input type="submit" onclick="writeInZone('zoneliste',DOCS.toHTML());"><br/>-->
         <div id="zoneliste"></div>
-        <br>
+      <h2>Gestion de l'histoire</h2>
         <input type="button" id="dwn-btn" value="Télécharger l'histoire au format JSON"/>
         <br>
         <br>
-        <label for="myfile">Pour continuer une histoire existante, uploader un fichier json</label><br>
+        <label for="myfile">Pour continuer une histoire existante, uploader un fichier json : </label>
         <input type="file" accept=".json" onchange="previewFile()"><br>
        <h2>Zone édition</h2>
         <div id="zoneedition"></div>
