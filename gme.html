@@ -1,3 +1,15 @@
+<!--/*--------------------------------------------
+    Author: https://github.io/orey/gme
+    Creation date: June 18 2022
+    Under GNU GPL v3 licence
+  --------------------------------------------
+    Application complète GME
+  --------------------------------------------
+    L'idée est un peu saugrenue. Faire une application offline
+    tenant dans une seule page avec le HTML, le CSS et tout le 
+    JavaScript, sans utiliser aucune inclusion mais juste des
+    fonctionnalités standard.
+--------------------------------------------*/-->
 <!DOCTYPE html>
 <html>
   <head lang="en">
@@ -33,13 +45,16 @@
 
       .menu {
           width: 15%;
+          font-size: small;
       }
 
       .content {
           width: 85%;
           background-color: white;
       }
-
+      textarea {
+          font-size: small;
+      }
       .menu ul {
           list-style-type: none;
           margin: 0;
@@ -130,12 +145,11 @@
           <div id="dice-result"></div>
         </div>
         <h3>Evénement aléatoire</h3>
-        <div id="dice">
+        <div id="ea">
           <form>
-            <label>Lancer 3d100</label><br>
-            <input type="text" id="re-focus"><br>
-            <input type="text" id="re-action"><br>
-            <input type="text" id="re-sujet"><br>
+            <label>1d100</label> <input type="text" id="re-focus"><br>
+            <label>1d100</label> <input type="text" id="re-action"><br>
+            <label>1d100</label> <input type="text" id="re-sujet"><br>
           </form>
           <br>
           <input type="submit" value="Tirer" onclick="controlRandomEvent();">
@@ -143,7 +157,36 @@
           <br><br>
           <div id="result-focus"></div>
         </div>
-      </div>
+        <h3>Oracle</h3>
+        <div id="ora">
+          <form>
+            <input type="radio" name="contexte" value="80">
+            <label>Presque certain</label><br>
+            <input type="radio" name="contexte" value="70">
+            <label>Très probable</label><br>
+            <input type="radio" name="contexte" value="60">
+            <label>Probable</label><br>
+            <input type="radio" name="contexte" value="50">
+            <label>Une chance sur deux</label><br>
+            <input type="radio" name="contexte" value="40">
+            <label>Plausible</label><br>
+            <input type="radio" name="contexte" value="30">
+            <label>Improbable</label><br>
+            <input type="radio" name="contexte" value="20">
+            <label>Très improbable</label><br>
+            <br>
+            <label>Question</label><br><textarea id="oracle-question" rows="3" cols="23"></textarea><br>
+            <label>1d100 </label><input type="text" id="oracle-dice"><br>
+          </form>
+          <br>
+          <input type="submit" value="Questionner l'Oracle" onclick="oracle();">
+          <input type="submit" value="Effacer" onclick="oracleEffacer();">
+          <input type="submit" value="Envoyer vers la scène en cours" onclick="oracleEnvoyer();">          
+          <br><br>
+          <div id="oracle-result"></div>
+          <br><br>
+        </div>
+      </div><!-- column menu -->
       <div class="column content">
         <h2>Gestion de l'histoire</h2>
         <table>
@@ -259,6 +302,16 @@
         document.getElementById(zone).innerHTML = "";
     }
 
+    //============================= UTILS
+
+    function getSelectedRadioValue(name){
+        let ele = document.getElementsByName(name);
+        for (let i = 0; i < ele.length; i++) {
+            if(ele[i].checked)
+                return ele[i].value;
+        }
+    }
+
     //============================= CONSTANTS
 
     const TYPE = {
@@ -338,6 +391,12 @@
         getElemById(id) {
             for (let e of this.liste)
                 if (e.id == id)
+                    return e;
+        }
+
+        getElemByTypeSeq(type, seq) {
+            for (let e of this.liste)
+                if ((e.type == type) && (e.sequence == seq))
                     return e;
         }
 
@@ -1169,12 +1228,75 @@
 
     /*
      Fin de Random event
-     */
+    */
+
+    
+    /*
+     Oracle
+    */
+    const ORA_LABELS = [
+        "Oui et...", // label 0
+        "Oui",       // label 1
+        "Oui mais...",
+        "Non mais...",
+        "Non",
+        "Non et..."
+    ];
+    
+    const ORA = {
+        // contexte, borne sup label 0, borne sup label 1, etc.
+        '20': [ 5, 15, 20, 30, 90],
+        '30': [10, 20, 30, 40, 90],
+        '40': [10, 30, 40, 50, 90],
+        '50': [10, 40, 50, 60, 90],
+        '60': [10, 50, 60, 70, 90],
+        '70': [10, 60, 70, 80, 90],
+        '80': [10, 70, 80, 85, 95]
+    };
+    
+    function theOracle(contexte, dice) {
+        let tab =  ORA[contexte];
+        for (let i=0;i < tab.length;i++)
+            if (dice <= tab[i])
+                return ORA_LABELS[i];
+        return ORA_LABELS[5];
+    }
+        
+    function oracle() {
+        let dice = document.getElementById("oracle-dice").value;
+        let mydice = 0;
+        if (dice != "")
+            mydice = Number(dice);
+        else {
+            mydice = rollDie(100);
+            document.getElementById("oracle-dice").value = mydice;
+        }
+        let contex = getSelectedRadioValue('contexte');
+        writeInZone('oracle-result', "Réponse de l'Oracle : " + theOracle(contex, mydice));
+    }
+
+    function oracleEffacer() {
+        document.getElementById("oracle-dice").value = "";
+        document.getElementById("oracle-question").value = "";
+    }
+
+    function oracleEnvoyer(x) {
+        let text = "\n" + document.getElementById("oracle-question").value + "\n"
+            + document.getElementById("oracle-result").innerHTML + "\n";
+        let n = DOCS.getNextSeqNum(TYPE.SCENE) - 1;
+        let e = DOCS.getElemByTypeSeq(TYPE.SCENE,n);
+        if (e.status == STATUS.NORMAL)
+            e.descr += text;
+        else
+            e.alternate += text;
+        refresh();
+    }
 
 
     
     //========================================================= DATA
     let DOCS = new ListeDocs();
+    let TEMP = null;
 
     DOCS.push(new Document(TYPE.PNJ,"Johnny Go",1, "C'est ma vie"));
     DOCS.push(new Document(TYPE.PNJ,"Fada Complet",2, "Rouboudou"));
