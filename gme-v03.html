@@ -15,8 +15,8 @@
       }
 
       .header, .footer {
-          background-color: #99CCFF;
-          color: blue;
+          background-color: grey;
+          color: white;
           padding: 15px;
       }
 
@@ -56,33 +56,15 @@
       .menu li:hover {
           background-color: #999999;
       }
-      table {
-          font-size: small;
-      }
-      th, td {
-          padding: 2px;
-      }
+      /*th, td {
+          background-color: #3333FF;
+          color: #ffffff;
+      }*/
       thead {
-          /*background-color: darkgrey;*/
-          background-color: #6699FF;
+          background-color: darkgrey;
       }
       tr:nth-child(even) {
-          /*background-color: #d6d6d6;*/
-          background-color: #99CCFF;
-      }
-      .white {
-          background-color: white;
-      }
-      h1 {
-          color: #000066;
-      }
-      h2 {
-          /*color: #0033CC;*/
-          color: #000099;
-      }
-      h3 {
-          /*color: #3366CC;*/
-          color: #0033CC;
+          background-color: #d6d6d6;
       }
     </style>
   </head>
@@ -96,18 +78,19 @@
 
     <div class="clearfix">
       <div class="column menu">
-        <!--<ul>
+        <ul>
           <li>The Flight</li>
           <li>The City</li>
           <li>The Island</li>
           <li>The Food</li>
-        </ul>-->
-        <h2>Outils</h2>
-        <h3>Lanceur de dés</h3>
+        </ul>
+      </div>
+      <div class="column content">
+        <h2>Lanceur de dés</h2>
         <div id="dice">
           <form>
             <label>Nombre</label>
-            <input type="text" id="dice-number"><br>
+            <input type="text" id="dice-number">
             <input type="radio" id="dice-d4" name="choicechoice" value="4">
             <label>d4</label>
             <input type="radio" id="dice-d6" name="choicechoice" value="6">
@@ -115,61 +98,44 @@
             <input type="radio" id="dice-d8" name="choicechoice" value="8">
             <label>d8</label>
             <input type="radio" id="dice-d10" name="choicechoice" value="10">
-            <label>d10</label><br>
+            <label>d10</label>
             <input type="radio" id="dice-d12" name="choicechoice" value="12">
             <label>d12</label>
             <input type="radio" id="dice-d20" name="choicechoice" value="20">
             <label>d20</label>
             <input type="radio" id="dice-d100" name="choicechoice" value="100" checked>
-            <label>d100</label><br>
-            <label>+ pips</label>
+            <label>d100</label>
+            <label>+</label>
             <input type="text" id="dice-pips"><br/>
           </form>
-          <br>
-          <input type="submit" value="Lancer" onclick="throwDice();"><br><br>
+          <input type="submit" value="Lancer" onclick="throwDice();"><br>
           <div id="dice-result"></div>
         </div>
-        <h3>Evénement aléatoire</h3>
+        <h2>Evénement aléatoire</h2>
         <div id="dice">
           <form>
-            <label>Lancer 3d100</label><br>
-            <input type="text" id="re-focus"><br>
-            <input type="text" id="re-action"><br>
-            <input type="text" id="re-sujet"><br>
+            <label>Lancer 3d100</label>
+            <input type="text" id="re-focus">
+            <input type="text" id="re-action">
+            <input type="text" id="re-sujet">            
           </form>
-          <br>
-          <input type="submit" value="Tirer" onclick="controlRandomEvent();">
-          <input type="submit" value="Réinitialiser" onclick="controlInitRandomEvent();">
-          <br><br>
+          <input type="submit" value="Tirer" onclick="controlRandomEvent();"><br>
           <div id="result-focus"></div>
         </div>
-      </div>
-      <div class="column content">
-        <h2>Gestion de l'histoire</h2>
-        <table>
-          <thead>
-            <tr>
-              <th style="width:250px">Nouvelle histoire</th>
-              <th style="width:250px">Sauvegarder l'histoire</th>
-              <th style="width:250px">Charger une histoire sauvegardée</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="text-align:center;"><input type="button" id="new-story" value="Nouvelle histoire" onclick="controlNewStory()"/></td>
-              <td style="text-align:center;"><input type="button" id="download-story" value="Télécharger l'histoire au format JSON"
-                                                    onclick="controlDownloadStory()"/></td>
-              <td style="text-align:center;"><input type="file" accept=".json" onchange="previewFile()"></td>
-            </tr>
-          </tbody>
-        </table>
-        <h2>Synthèse de l'histoire</h2>
+        <h2>Zone liste</h2>
+        <!--<input type="submit" onclick="writeInZone('zoneliste',DOCS.toHTML());"><br/>-->
         <div id="zoneliste"></div>
-        <h2>Zone édition</h2>
+      <h2>Gestion de l'histoire</h2>
+        <input type="button" id="dwn-btn" value="Télécharger l'histoire au format JSON"/>
+        <br>
+        <br>
+        <label for="myfile">Pour continuer une histoire existante, uploader un fichier json : </label>
+        <input type="file" accept=".json" onchange="previewFile()"><br>
+       <h2>Zone édition</h2>
         <div id="zoneedition"></div>
       </div>
       <div class="footer">
-        <p style='font-size:small'>&#169; 2022 <a href="https://orey.github.io/blog/">rouboudou</a></p>
+        <p>Copyright Olivier Rey 2022</p>
       </div>
     </div><!--container-->
   </body>
@@ -226,12 +192,12 @@
             if(ele[i].checked)
                 faces = ele[i].value;
         }
-        let temp = mynumber + "d" + faces + "+" + mypips;
-        myconsole.log(temp);
-        writeInZone('dice-result', "<table><thead><tr><th>Jet</th><th>Résultat</th></tr></thead>"
-                    + "<tbody><tr class='white'><td>"
-                    + temp + "</td><td>" +
-                    roll(mynumber,parseInt(faces),mypips).toString() + "</td></tr></tbody></table>");
+        myconsole.log(number + "d" + 
+                      faces + "+" +
+                      pips);
+        writeInZone('dice-result', "Résultat : <span class='mybold'>" +
+                    roll(mynumber,parseInt(faces),mypips).toString() +
+                   "</span>");
         refresh();
     }
 
@@ -493,7 +459,7 @@
         outputscenes += `
   </tbody>
 </table>
-<input value="Nouvelle scène" type="submit" onclick="createDoc('${TYPE.SCENE}');"><br>
+<input value="Nouvelle scene" type="submit" onclick="createDoc('${TYPE.SCENE}');"><br>
 `;
         let separator = "<br/>";
         return outputscenes + separator + outputpnj + separator + outputpistes;
@@ -673,24 +639,13 @@
     }
 
     // Start file download.
-    function controlDownloadStory() {
+    document.getElementById("dwn-btn").addEventListener("click", function(){
         // Generate download of hello.txt file with some content
         var text = jsonExport();
         var filename = "histoire.json";
+        
         download(filename, text);
-    }
-
-    // Nouvelle histoire
-    function controlNewStory(){
-        let result = confirm("Créer une nouvelle histoire va supprimer toutes les données "
-                             + "de l'histoire en cours. Etes-vous certain de vouloir faire cela ?");
-        if (result) {
-            myconsole.log("Nouvelle histoire");
-            DOCS = new ListeDocs();
-            refresh();
-        }
-    }
-    
+    }, false);
 
     //========================================================= Import a json file
 
@@ -1136,34 +1091,15 @@
     /*--------------------------------------
      * Contrôleur
      *--------------------------------------*/
-
-    function controlInitRandomEvent() {
-        document.getElementById("re-focus").value = "";
-        document.getElementById("re-action").value = "";
-        document.getElementById("re-sujet").value = "";
-    }
-
+    
     function controlRandomEvent() {
-        let output = "<table><thead><tr><th>Evénement</th><th>Valeur</th></tr></thead><tbody>";
         let num = Number(document.getElementById("re-focus").value);
-        if (num == 0) {
-            num = rollDie(100);
-            document.getElementById("re-focus").value = num;
-        }
         let f = getFocus(num);
-        output += "<tr class='white'><td>Type</td><td>" + f[1] + "</td></tr>";
+        let output = "<p>Type : " + f[1] + "</p>";
         let num2 = Number(document.getElementById("re-action").value);
-        if (num2 == 0) {
-            num2 = rollDie(100);
-            document.getElementById("re-action").value = num2;
-        }
-        output += "<tr><td>Sens - Action</td><td>" + getAction(num2)[1] + "</td></tr>";
+        output += "<p>Action : " + getAction(num2)[1] + "</p>";
         let num3 = Number(document.getElementById("re-sujet").value);
-        if (num3 == 0) {
-            num3 = rollDie(100);
-            document.getElementById("re-sujet").value = num3;
-        }
-        output += "<tr class='white'><td>Sens - Sujet</td><td>" + getSens(num3)[1] + "</td></tr></tbody></table>";
+        output += "<p>Sujet : " + getSens(num3)[1] + "</p>";
         writeInZone('result-focus',output);
     }
 
@@ -1175,6 +1111,7 @@
     
     //========================================================= DATA
     let DOCS = new ListeDocs();
+    let TEMP = null; 
 
     DOCS.push(new Document(TYPE.PNJ,"Johnny Go",1, "C'est ma vie"));
     DOCS.push(new Document(TYPE.PNJ,"Fada Complet",2, "Rouboudou"));
