@@ -332,18 +332,6 @@
         INTERROMPUE: "Interrompue"
     }
 
-    //============================= Root
-    class Root {
-
-    }
-
-    //============================= Character
-    class Character {
-
-    }
-
-
-
     //============================= Document
     class Document {
         constructor(type,
@@ -731,6 +719,15 @@
 
     }
 
+    //========================================================= Link
+    class Link {
+        constructor(sid, tid, descr){
+            this.sid = sid;
+            this.tid = tid;
+            this.descr = descr;
+        }
+    }
+    
     //========================================================= Export
     function jsonExport(){
         return JSON.stringify(DOCS);
